@@ -182,5 +182,3 @@ class UnitTest(unittest.TestCase):
         self.assertEqual(color(3, 1, MAX_ITER/3), (0, 0, 170))
         self.assertEqual(color(3, 2, MAX_ITER/3*2), (0, 85, 0))
         self.assertEqual(color(3, 2, MAX_ITER), (0, 0, 0))
-
-Polynomial([-1j, 2+3j, 6-1j, 2j]).sequence(10+10j, -10-10j, 1+1j, -1-1j, 100, 100, 10, 'pic.png')
