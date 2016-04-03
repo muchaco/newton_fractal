@@ -12,12 +12,12 @@ Import the python file
 import newton_fractal as nf
 ```
 
-### Crete polynomial
+### Create polynomial
 Crate polynomial x(x-1)(x-2)(x-3) with its roots
 ```python
 p = nf.Polynomial([0, 1, 2, 3], 'roots')
 ```
-Crate polynomial (3i)x^3^+(-2+i)x^2^-1 with complex coefficients
+Crate polynomial (3i)x^3+(-2+i)x^2-1 with complex coefficients
 ```python
 p = nf.Polynomial([3j, -2+1j, 0, -1], 'coefficients')
 ```
