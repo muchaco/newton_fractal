@@ -4,6 +4,9 @@
 from PIL import Image
 import operator
 import unittest
+import subprocess
+import os
+import shutil
 
 ERROR = 0.01
 MAX_ITER = 30
@@ -94,6 +97,7 @@ class Polynomial:
         image.save("images/" + file_name + '.png', "PNG")
 
     def sequence(self, xa, ya, xb, yb, width, height, n, file):
+        os.mkdir('images/temp/')
         for i in xrange(0, n):
             x1 = ya.real-xa.real
             x2 = yb.real-xb.real
@@ -103,14 +107,15 @@ class Polynomial:
             yd = y1*((float(y2)/y1)**(1.0/(n-1)))**i
 
             if x1-x2 == 0:
-                x = 1 - float(i)/n
-                y = 1 - float(i)/n
+                x = 1-float(i)/n
+                y = 1-float(i)/n
             else:
                 x = float(xd-x2)/(x1-x2)
                 y = float(yd-y2)/(y1-y2)
 
-            self.draw_fractal(xa*x+xb*(1-x), ya*y+yb*(1-y), width, height, file+str(i).zfill(3))
-            # convert -delay 10 -loop 0 *png output.gif
+            self.draw_fractal(xa*x+xb*(1-x), ya*y+yb*(1-y), width, height, "temp/"+str(i).zfill(3))
+        subprocess.call("convert -delay 10 -loop 0 images/temp/*png images/" + file + ".gif", shell=True)
+        shutil.rmtree('images/temp/')
 
     def __eq__(self, a):
         return self.coeff == a.coeff
@@ -177,3 +182,5 @@ class UnitTest(unittest.TestCase):
         self.assertEqual(color(3, 1, MAX_ITER/3), (0, 0, 170))
         self.assertEqual(color(3, 2, MAX_ITER/3*2), (0, 85, 0))
         self.assertEqual(color(3, 2, MAX_ITER), (0, 0, 0))
+
+Polynomial([-1j, 2+3j, 6-1j, 2j]).sequence(10+10j, -10-10j, 1+1j, -1-1j, 100, 100, 10, 'pic.png')
