@@ -70,7 +70,11 @@ class Polynomial:
                 x = float("infinity")
             k += +1
         # it is a root, and it is not already in the list of roots:
-        if abs(self.evaluate(x)) < ERROR and ((min([abs(i-x) for i in self.roots]) > ERROR) or len(self.roots) == 0):
+        try:
+            root_not_found_yet = min([abs(i-x) for i in self.roots]) > ERROR
+        except ValueError:
+            root_not_found_yet = True
+        if abs(self.evaluate(x)) < ERROR and root_not_found_yet:
             self.roots.append(x)
         return x, k
 
@@ -88,16 +92,26 @@ class Polynomial:
                 zx = x * (xb - xa) / (width - 1) + xa
                 z = complex(zx, zy)
                 root, iter = self.newton(z, MAX_ITER)
-                min_index, min_value = min(enumerate([abs(i-root) for i in self.roots]), key=operator.itemgetter(1))
+                try:
+                    min_index, min_value = min(enumerate([abs(i-root) for i in self.roots]), key=operator.itemgetter(1))
+                except ValueError:
+                    min_value = ERROR+1
                 if min_value < ERROR:
                     image.putpixel((x, height-1-y), color(len(self.coeff)-1, min_index, iter))
                 else:
                     image.putpixel((x, height-1-y), (0, 0, 0))
 
-        image.save("images/" + file_name + '.png', "PNG")
+        try:
+            image.save("images/" + file_name + '.png', "PNG")
+        except IOError:
+            os.mkdir('images/')
 
-    def sequence(self, xa, ya, xb, yb, width, height, n, file):
-        os.mkdir('images/temp/')
+    def animate_fractal(self, xa, ya, xb, yb, width, height, n, file_name):
+        try:
+            os.mkdir('images/')
+            os.mkdir('images/temp/')
+        except OSError:
+            pass
         for i in xrange(0, n):
             x1 = ya.real-xa.real
             x2 = yb.real-xb.real
@@ -114,11 +128,12 @@ class Polynomial:
                 y = float(yd-y2)/(y1-y2)
 
             self.draw_fractal(xa*x+xb*(1-x), ya*y+yb*(1-y), width, height, "temp/"+str(i).zfill(3))
-        subprocess.call("convert -delay 10 -loop 0 images/temp/*png images/" + file + ".gif", shell=True)
+        subprocess.call("convert -delay 10 -loop 0 images/temp/*png images/" + file_name + ".gif", shell=True)
         shutil.rmtree('images/temp/')
 
     def __eq__(self, a):
         return self.coeff == a.coeff
+
 
 def color(n, k, iter):
     """
